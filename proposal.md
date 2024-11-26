@@ -1,4 +1,4 @@
-# Projecy Description
+# Project Description
 
 This project will be a top down tower defense game inspired by the Bloons TD series, in which a player will spend money that is gained from defeating enemies that move along a path, and at the start to place towers in order to defend the end of the path
 
