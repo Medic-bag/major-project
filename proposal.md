@@ -4,14 +4,14 @@ This project will be a top down tower defense game inspired by the Bloons TD ser
 
 ## Needs to have
 
-    -At least 3 towers
+    -Multiple towers
         -multiple tower types that each have a different funcionality
         -each tower should be upgradeable to become more powerful
         -towers must not be able to collide with each other when they are places by a player
     -Projectiles
         -projectiles must properly collide with enemies
         -projectiles must lower an enemies health if it collides with an enemy
-    -At least 3 enemy types
+    -Various enemy types
         -enemies must move along a path
         -enemies must collide with projectiles and lose health while doing so
         -enemies must properly die when their health reaches 0
