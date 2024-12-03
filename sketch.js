@@ -5,9 +5,34 @@
 // Extra for Experts:
 // - describe what you did to take this project "above and beyond"
 
+// Classes
+class Tower {
+  constructor(x, y, radius) {
+    this.x = x;
+    this.y = y;
+    this.radius = radius;
+  }
+
+  display() {
+    noStroke();
+    circle(this.x, this.y, this.radius * 2);
+  }
+}
+
+// High damage Tower with slow attack speed and high range
+class Sniper extends Tower {
+  constructor(x, y, radius, color, damage, attackSpeed, range) {
+    super(x, y, radius);
+    this.color = color;
+    this.damage = damage;
+    this.range = range;
+  }
+
+}
+
 // Variables and Constants
-let grid;
-let cellSize = 20;
+
+
 function setup() {
   createCanvas(windowWidth, windowHeight);
 }
