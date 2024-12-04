@@ -30,6 +30,25 @@ class Sniper extends Tower {
 
 }
 
+class Enemy {
+  constructor(x, y, radius) {
+    this.x = x;
+    this.y = y;
+    this.radius = radius;
+  }
+
+  display() {
+    noStroke();
+    circle(this.x, this.y, this.radius);
+  }
+
+  move()  {
+
+  }
+}
+
+
+
 // Variables and Constants
 
 
@@ -39,6 +58,19 @@ function setup() {
 
 function draw() {
   background(220);
+  drawPath();
 }
 
-// Test
+function drawPath() {
+  line(0, height/2,  width/ 10, height/2);
+  line(width/10, height/2, width/10, height/1.5);
+  line(width/10, height/1.5, width/5, height/1.5);
+  line(width/5, height/1.5, width/5, height/3);
+  line(width/5, height/3, width/10 * 3, height/3);
+  line(width/10 * 3, height/3, width/10 * 3, height/1.25);
+  line(width/10 * 3, height/1.25, width/5 * 2, height/1.25);
+  line(width/5 * 2, height/1.25, width/5 * 2, height/4);
+  line(width/5 * 2, height/4, width/5 * 3, height/4);
+  line(width/5 * 3, height/4, width/5 * 3, height/1.25);
+  line(width/5 * 3, height/4, width/5 * 3, height/1.25);
+}
