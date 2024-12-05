@@ -21,7 +21,7 @@ class Tower {
 
 // High damage Tower with slow attack speed and high range
 class Sniper extends Tower {
-  constructor(x, y, radius, color, damage, attackSpeed, range) {
+  constructor(x, y, radius, damage, attackSpeed, range) {
     super(x, y, radius);
     this.color = color;
     this.damage = damage;
@@ -32,7 +32,7 @@ class Sniper extends Tower {
 
 class Enemy {
   constructor(x, y, radius) {
-    this.x = x;
+    this.x = 0;
     this.y = y;
     this.radius = radius;
   }
@@ -47,7 +47,15 @@ class Enemy {
   }
 }
 
-
+class NormalEnemy extends Enemy {
+  constructor(health, speed, damage) {
+    super(x, y, radius);
+    this.health = health;
+    this.speed = speed;
+    this.damage = damage;
+    this.color = 'red';
+  }
+}
 
 // Variables and Constants
 
@@ -72,5 +80,11 @@ function drawPath() {
   line(width/5 * 2, height/1.25, width/5 * 2, height/4);
   line(width/5 * 2, height/4, width/5 * 3, height/4);
   line(width/5 * 3, height/4, width/5 * 3, height/1.25);
-  line(width/5 * 3, height/4, width/5 * 3, height/1.25);
+  line(width/5 * 3, height/1.25, width/10 * 7, height/1.25);
+  line(width/10 * 7, height/1.25, width/10 * 7, height/3);
+  line(width/10 * 7, height/3, width/5 * 4, height/3);
+  line(width/5 * 4, height/3, width/5 * 4, height/1.5);
+  line(width/5 * 4, height/1.5, width/10 * 9, height/1.5);
+  line(width/10 * 9, height/1.5, width/10 * 9, height/2);
+  line(width/10 * 9, height/2, width, height/2);
 }
