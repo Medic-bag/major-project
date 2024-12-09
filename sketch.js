@@ -49,19 +49,31 @@ class Enemy {
   }
 
   move() {
-    if (this.x <= width/10 - this.speed) {
+    if (this.x < width/10 - this.speed) {
       this.x += this.speed;
-      console.log(this.x);
     }
-    if (this.y >= height/1.5 && this.x === width/10) {
+    if (this.y < Math.floor(height/1.5) && this.x === Math.floor(width/10)) {
       this.y += this.speed;
     }
-    if (this.x <= width / 5 && this.y === height/1.5) {
+    if (this.x < Math.floor(width/5) && this.y === Math.floor(height/1.5)) {
       this.x += this.speed;
     }
-    if (this.y <= height/3 && this.x === width/5) {
+    if (this.y > Math.floor(height/3) && this.x === Math.floor(width/5)) {
       this.y -= this.speed;
     }
+    if (this.x < Math.floor(width/10*3) && this.y === Math.floor(height/3)) {
+      this.x += this.speed;
+    }
+    if (this.y < Math.floor(height/1.25) && this.x === Math.floor(width/10 * 3)) {
+      this.y += this.speed;
+    }
+    if (this.x < Math.floor(width/5 * 2) && this.y === Math.floor(height/1.25)) {
+      this.x += this.speed;
+    }
+    if (this.y > Math.floor(height/4) && this.x === Math.floor(width/5 * 2)) {
+      this.y -= this.speed;
+    }
+
   }
 }
 
@@ -70,7 +82,7 @@ class NormalEnemy extends Enemy {
   constructor(y) {
     super(y);
     this.health = 10;
-    this.speed += 1;
+    this.speed = 1;
     this.damage = 1;
     this.color = 'red';
   }
@@ -94,32 +106,32 @@ function setup() {
 
 function draw() {
   background(220);
+  drawPath();
   for (let enemy of grid) {
     enemy.move();
     enemy.display();
-    drawPath();
-    
   }
 }
 
 function drawPath() {
-  line(0, height/2,  width/10, height/2);
-  line(width/10, height/2, width/10, height/1.5);
-  line(width/10, height/1.5, width/5, height/1.5);
-  line(width/5, height/1.5, width/5, height/3);
-  line(width/5, height/3, width/10 * 3, height/3);
-  line(width/10 * 3, height/3, width/10 * 3, height/1.25);
-  line(width/10 * 3, height/1.25, width/5 * 2, height/1.25);
-  line(width/5 * 2, height/1.25, width/5 * 2, height/4);
-  line(width/5 * 2, height/4, width/5 * 3, height/4);
-  line(width/5 * 3, height/4, width/5 * 3, height/1.25);
-  line(width/5 * 3, height/1.25, width/10 * 7, height/1.25);
-  line(width/10 * 7, height/1.25, width/10 * 7, height/3);
-  line(width/10 * 7, height/3, width/5 * 4, height/3);
-  line(width/5 * 4, height/3, width/5 * 4, height/1.5);
-  line(width/5 * 4, height/1.5, width/10 * 9, height/1.5);
-  line(width/10 * 9, height/1.5, width/10 * 9, height/2);
-  line(width/10 * 9, height/2, width, height/2);
+  stroke('black');
+  line(0, Math.floor(height/2),  Math.floor(width/10), Math.floor(height/2));
+  line(Math.floor(width/10), Math.floor(height/2), Math.floor(width/10), Math.floor(height/1.5));
+  line(Math.floor(width/10), Math.floor(height/1.5), Math.floor(width/5), Math.floor(height/1.5));
+  line(Math.floor(width/5), Math.floor(height/1.5), Math.floor(width/5), Math.floor(height/3));
+  line(Math.floor(width/5), Math.floor(height/3), Math.floor(width/10 * 3), Math.floor(height/3));
+  line(Math.floor(width/10 * 3), Math.floor(height/3), Math.floor(width/10 * 3), Math.floor(height/1.25));
+  line(Math.floor(width/10 * 3), Math.floor(height/1.25), Math.floor(width/5 * 2), Math.floor(height/1.25));
+  line(Math.floor(width/5 * 2), Math.floor(height/1.25), Math.floor(width/5 * 2), Math.floor(height/4));
+  line(Math.floor(width/5 * 2), Math.floor(height/4), Math.floor(width/5 * 3), Math.floor(height/4));
+  line(Math.floor(width/5 * 3), Math.floor(height/4), Math.floor(width/5 * 3), Math.floor(height/1.25));
+  line(Math.floor(width/5 * 3), Math.floor(height/1.25), Math.floor(width/10 * 7), Math.floor(height/1.25));
+  line(Math.floor(width/10 * 7), Math.floor(height/1.25), Math.floor(width/10 * 7), Math.floor(height/3));
+  line(Math.floor(width/10 * 7), Math.floor(height/3), Math.floor(width/5 * 4), Math.floor(height/3));
+  line(Math.floor(width/5 * 4), Math.floor(height/3), Math.floor(width/5 * 4), Math.floor(height/1.5));
+  line(Math.floor(width/5 * 4), Math.floor(height/1.5), Math.floor(width/10 * 9), Math.floor(height/1.5));
+  line(Math.floor(width/10 * 9), Math.floor(height/1.5), Math.floor(width/10 * 9), Math.floor(height/2));
+  line(Math.floor(width/10 * 9), Math.floor(height/2), Math.floor(width), Math.floor(height/2));
 }
 
 function mousePressed() {
