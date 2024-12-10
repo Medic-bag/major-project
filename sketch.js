@@ -1,4 +1,4 @@
-// Swagalicous Tower defense
+// Swagalicous Major Project 2: Electric Boogaloo
 // Riley Sane and Chase Buniak
 // January whenever, 2024
 //
@@ -6,8 +6,10 @@
 // - describe what you did to take this project "above and beyond"
 
 // to do list
-// - floor the lines for the path
-// - get rid of console.log in enemy.move()
+// Fix tower classes
+// Make a tower
+// Add to the ui
+// Have enemies be damagable
 
 // Classes
 class Tower {
@@ -25,13 +27,25 @@ class Tower {
 
 // High damage Tower with slow attack speed and high range
 class Sniper extends Tower {
-  constructor(x, y, radius, damage, attackSpeed, range) {
+  constructor(color, damage, attackSpeed, range) {
     super(x, y, radius);
-    this.color = color;
-    this.damage = damage;
-    this.range = range;
+    this.color = 'yellow';
+    this.damage = 7;
+    this.range = 50;
+    this.attackSpeed = 2;
   }
 
+  attack() {
+    let closestEnemyIndex = 0;
+    for (enemy in enemyArray) {
+      if (dist(enemy.x, enemy.y, width, Math.floor(height/2)) > dist(closestEnemyIndex.x, closestEnemyIndex.y, width, Math.floor(height/2))) {
+        closestEnemyIndex = enemyArray.indexOf(enemy);
+      }
+      if (enemyArray.indexOf(enemy) === closestEnemyIndex) {
+        enemy.health -= this.damage;
+      }
+    }
+  }
 }
 
 // Parent Class for the enemies.
@@ -52,28 +66,54 @@ class Enemy {
     if (this.x < width/10 - this.speed) {
       this.x += this.speed;
     }
-    if (this.y < Math.floor(height/1.5) && this.x === Math.floor(width/10)) {
+    else if (this.y < Math.floor(height/1.5) && this.x === Math.floor(width/10)) {
       this.y += this.speed;
     }
-    if (this.x < Math.floor(width/5) && this.y === Math.floor(height/1.5)) {
+    else if (this.x < Math.floor(width/5) && this.y === Math.floor(height/1.5)) {
       this.x += this.speed;
     }
-    if (this.y > Math.floor(height/3) && this.x === Math.floor(width/5)) {
+    else if (this.y > Math.floor(height/3) && this.x === Math.floor(width/5)) {
       this.y -= this.speed;
     }
-    if (this.x < Math.floor(width/10*3) && this.y === Math.floor(height/3)) {
+    else if (this.x < Math.floor(width/10*3) && this.y === Math.floor(height/3)) {
       this.x += this.speed;
     }
-    if (this.y < Math.floor(height/1.25) && this.x === Math.floor(width/10 * 3)) {
+    else if (this.y < Math.floor(height/1.25) && this.x === Math.floor(width/10 * 3)) {
       this.y += this.speed;
     }
-    if (this.x < Math.floor(width/5 * 2) && this.y === Math.floor(height/1.25)) {
+    else if (this.x < Math.floor(width/5 * 2) && this.y === Math.floor(height/1.25)) {
       this.x += this.speed;
     }
-    if (this.y > Math.floor(height/4) && this.x === Math.floor(width/5 * 2)) {
+    else if (this.y > Math.floor(height/4) && this.x === Math.floor(width/5 * 2)) {
       this.y -= this.speed;
     }
-
+    else if (this.x < Math.floor(width/5 * 3) && this.y === Math.floor(height/4)) {
+      this.x += this.speed;
+    }
+    else if (this.y < Math.floor(height/1.25) && this.x === Math.floor(width/5 * 3)) {
+      this.y += this.speed;
+    }
+    else if (this.x < Math.floor(width/10 * 7) && this.y === Math.floor(height/1.25)) {
+      this.x += this.speed;
+    }
+    else if (this.y > Math.floor(height/3) && this.x === Math.floor(width/10 * 7)) {
+      this.y -= this.speed;
+    }
+    else if (this.x < Math.floor(width/5 * 4) && this.y === Math.floor(height/3)) {
+      this.x += this.speed;
+    }
+    else if (this.y < Math.floor(height/1.5) && this.x === Math.floor(width/5 * 4)) {
+      this.y += this.speed;
+    }
+    else if (this.x < Math.floor(width/10 * 9) && this.y === Math.floor(height/1.5)) {
+      this.x += this.speed;
+    }
+    else if (this.y > Math.floor(height/2) && this.x === Math.floor(width/10 * 9)) {
+      this.y -= this.speed;
+    }
+    else if (this.x < width && this.y === Math.floor(height/2)) {
+      this.x += this.speed;
+    }
   }
 }
 
@@ -86,6 +126,7 @@ class NormalEnemy extends Enemy {
     this.damage = 1;
     this.color = 'red';
   }
+
   display() {
     fill(this.color);
     super.display();
@@ -94,11 +135,11 @@ class NormalEnemy extends Enemy {
   move() {
     super.move();
   }
-
 }
 
 // Variables and Constants
-let grid = [];
+let enemyArray = [];
+let playerHealth = 100;
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
@@ -107,9 +148,25 @@ function setup() {
 function draw() {
   background(220);
   drawPath();
-  for (let enemy of grid) {
+  normalEnemyAI();
+  ui();
+}
+
+function ui() {
+  fill('black');
+  text(playerHealth, 10, 10);
+}
+
+function normalEnemyAI() {
+  for (let enemy of enemyArray) {
+    let enemyIndex = enemyArray.indexOf(enemy);
+    enemy.move();
     enemy.move();
     enemy.display();
+    if (enemy.x === width) {
+      enemyArray.splice(enemyIndex, 1);
+      playerHealth -= 1;
+    }
   }
 }
 
@@ -131,11 +188,11 @@ function drawPath() {
   line(Math.floor(width/5 * 4), Math.floor(height/3), Math.floor(width/5 * 4), Math.floor(height/1.5));
   line(Math.floor(width/5 * 4), Math.floor(height/1.5), Math.floor(width/10 * 9), Math.floor(height/1.5));
   line(Math.floor(width/10 * 9), Math.floor(height/1.5), Math.floor(width/10 * 9), Math.floor(height/2));
-  line(Math.floor(width/10 * 9), Math.floor(height/2), Math.floor(width), Math.floor(height/2));
+  line(Math.floor(width/10 * 9), Math.floor(height/2), width, Math.floor(height/2));
 }
 
-function mousePressed() {
+function keyPressed() {
   let someEnemy = new NormalEnemy(height/2);
-  grid.push(someEnemy);
+  enemyArray.push(someEnemy);
 }
 
