@@ -27,22 +27,32 @@ class Tower {
 
 // High damage Tower with slow attack speed and high range
 class Sniper extends Tower {
-  constructor(color, damage, attackSpeed, range) {
+  constructor(x, y, radius) {
     super(x, y, radius);
     this.color = 'yellow';
     this.damage = 7;
-    this.range = 50;
-    this.attackSpeed = 2;
+    this.range = 500;
+    this.attackSpeed = 60;
+    this.cooldown = 0;
+  }
+
+  display() {
+    fill(this.color);
+    super.display();
   }
 
   attack() {
     let closestEnemyIndex = 0;
-    for (enemy in enemyArray) {
-      if (dist(enemy.x, enemy.y, width, Math.floor(height/2)) > dist(closestEnemyIndex.x, closestEnemyIndex.y, width, Math.floor(height/2))) {
+    if (this.cooldown < 60) {
+      this.cooldown++;
+    }
+    for (let enemy of enemyArray) {
+      if (dist(enemy.x, enemy.y, width, Math.floor(height/2)) > dist(enemyArray[closestEnemyIndex].x, enemyArray[closestEnemyIndex].y, width, Math.floor(height/2))) {
         closestEnemyIndex = enemyArray.indexOf(enemy);
       }
-      if (enemyArray.indexOf(enemy) === closestEnemyIndex) {
+      if (enemyArray.indexOf(enemy) === closestEnemyIndex && this.cooldown === this.attackSpeed && dist(enemyArray[closestEnemyIndex].x, enemyArray[closestEnemyIndex].y, this.x, this.y) < this.range) {
         enemy.health -= this.damage;
+        this.cooldown = 0;
       }
     }
   }
@@ -140,20 +150,22 @@ class NormalEnemy extends Enemy {
 // Variables and Constants
 let enemyArray = [];
 let playerHealth = 100;
+let towerArray = [];
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
 }
 
 function draw() {
-  background(220);
+  background(0);
   drawPath();
   normalEnemyAI();
   ui();
+  towerAI();
 }
 
 function ui() {
-  fill('black');
+  fill('white');
   text(playerHealth, 10, 10);
 }
 
@@ -167,11 +179,14 @@ function normalEnemyAI() {
       enemyArray.splice(enemyIndex, 1);
       playerHealth -= 1;
     }
+    if (enemy.health <= 0) {
+      enemyArray.splice(enemyIndex, 1);
+    }
   }
 }
 
 function drawPath() {
-  stroke('black');
+  stroke('white');
   line(0, Math.floor(height/2),  Math.floor(width/10), Math.floor(height/2));
   line(Math.floor(width/10), Math.floor(height/2), Math.floor(width/10), Math.floor(height/1.5));
   line(Math.floor(width/10), Math.floor(height/1.5), Math.floor(width/5), Math.floor(height/1.5));
@@ -192,7 +207,20 @@ function drawPath() {
 }
 
 function keyPressed() {
-  let someEnemy = new NormalEnemy(height/2);
+
+  let someEnemy = new NormalEnemy(Math.floor(height/2));
   enemyArray.push(someEnemy);
+  
 }
 
+function towerAI() {
+  for (let tower of towerArray) {
+    tower.display();
+    tower.attack();
+  }
+}
+
+function mousePressed() {
+  let someTower = new Sniper(mouseX, mouseY, 10);
+  towerArray.push(someTower);
+}
