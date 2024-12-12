@@ -21,7 +21,26 @@ class Tower {
 
   display() {
     noStroke();
+    if (dist(mouseX, mouseY, this.x, this.y) <= this.radius) {
+      circle(this.x, this.y, this.range);
+    }
     circle(this.x, this.y, this.radius * 2);
+  }
+
+  attack() {
+    let closestEnemyIndex = 0;
+    if (this.cooldown < this.attackSpeed) {
+      this.cooldown++;
+    }
+    for (let enemy of enemyArray) {
+      if (dist(enemy.x, enemy.y, width, Math.floor(height/2)) > dist(enemyArray[closestEnemyIndex].x, enemyArray[closestEnemyIndex].y, width, Math.floor(height/2))) {
+        closestEnemyIndex = enemyArray.indexOf(enemy);
+      }
+      if (enemyArray.indexOf(enemy) === closestEnemyIndex && this.cooldown === this.attackSpeed && dist(enemyArray[closestEnemyIndex].x, enemyArray[closestEnemyIndex].y, this.x, this.y) < this.range) {
+        enemy.health -= this.damage;
+        this.cooldown = 0;
+      }
+    }
   }
 }
 
@@ -37,24 +56,32 @@ class Sniper extends Tower {
   }
 
   display() {
+    
+    super.display();
+  }
+
+  attack() {
+    super.attack();
+  }
+}
+
+class NormalTower extends Tower {
+  constructor(x, y, radius) {
+    super(x, y, radius);
+    this.color = 'blue';
+    this.damage = 4;
+    this.range = 300;
+    this.attackSpeed = 20;
+    this.cooldown = 0;
+  }
+
+  display() {
     fill(this.color);
     super.display();
   }
 
   attack() {
-    let closestEnemyIndex = 0;
-    if (this.cooldown < 60) {
-      this.cooldown++;
-    }
-    for (let enemy of enemyArray) {
-      if (dist(enemy.x, enemy.y, width, Math.floor(height/2)) > dist(enemyArray[closestEnemyIndex].x, enemyArray[closestEnemyIndex].y, width, Math.floor(height/2))) {
-        closestEnemyIndex = enemyArray.indexOf(enemy);
-      }
-      if (enemyArray.indexOf(enemy) === closestEnemyIndex && this.cooldown === this.attackSpeed && dist(enemyArray[closestEnemyIndex].x, enemyArray[closestEnemyIndex].y, this.x, this.y) < this.range) {
-        enemy.health -= this.damage;
-        this.cooldown = 0;
-      }
-    }
+    super.attack();
   }
 }
 
@@ -151,6 +178,7 @@ class NormalEnemy extends Enemy {
 let enemyArray = [];
 let playerHealth = 100;
 let towerArray = [];
+let money = 100;
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
@@ -166,7 +194,8 @@ function draw() {
 
 function ui() {
   fill('white');
-  text(playerHealth, 10, 10);
+  text('Health: ' + playerHealth, 10, 10);
+  text('Money: ' + money, 10, 30);
 }
 
 function normalEnemyAI() {
@@ -181,6 +210,7 @@ function normalEnemyAI() {
     }
     if (enemy.health <= 0) {
       enemyArray.splice(enemyIndex, 1);
+      money += 50;
     }
   }
 }
@@ -221,6 +251,14 @@ function towerAI() {
 }
 
 function mousePressed() {
-  let someTower = new Sniper(mouseX, mouseY, 10);
-  towerArray.push(someTower);
+  if (keyIsDown(83) && money >= 100) {
+    let someTower = new Sniper(mouseX, mouseY, 10);
+    towerArray.push(someTower);
+    money -= 100;
+  }
+  if (keyIsDown(78) && money >= 50) {
+    let someTower = new NormalTower(mouseX, mouseY, 10);
+    towerArray.push(someTower);
+    money -= 50;
+  }
 }
