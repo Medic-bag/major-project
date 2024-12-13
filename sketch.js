@@ -6,10 +6,7 @@
 // - describe what you did to take this project "above and beyond"
 
 // to do list
-// Fix tower classes
-// Make a tower
 // Add to the ui
-// Have enemies be damagable
 
 // Classes
 class Tower {
@@ -21,10 +18,12 @@ class Tower {
 
   display() {
     noStroke();
-    if (dist(mouseX, mouseY, this.x, this.y) <= this.radius) {
-      circle(this.x, this.y, this.range);
-    }
+    fill(this.color);
     circle(this.x, this.y, this.radius * 2);
+    if (dist(mouseX, mouseY, this.x, this.y) <= this.radius) {
+      fill(this.rangeColor);
+      circle(this.x, this.y, this.range * 2);
+    }
   }
 
   attack() {
@@ -37,6 +36,8 @@ class Tower {
         closestEnemyIndex = enemyArray.indexOf(enemy);
       }
       if (enemyArray.indexOf(enemy) === closestEnemyIndex && this.cooldown === this.attackSpeed && dist(enemyArray[closestEnemyIndex].x, enemyArray[closestEnemyIndex].y, this.x, this.y) < this.range) {
+        stroke(this.color);
+        line(enemy.x, enemy.y, this.x, this.y);
         enemy.health -= this.damage;
         this.cooldown = 0;
       }
@@ -44,12 +45,13 @@ class Tower {
   }
 }
 
-// High damage Tower with slow attack speed and high range
-class Sniper extends Tower {
+// High damage Tower with slow attack speed and high range; bisque in colouring. 
+class LongRange extends Tower {
   constructor(x, y, radius) {
     super(x, y, radius);
-    this.color = 'yellow';
-    this.damage = 7;
+    this.color = color(242, 210, 189);
+    this.rangeColor = color(242, 210, 189, 50);
+    this.damage = 10;
     this.range = 500;
     this.attackSpeed = 60;
     this.cooldown = 0;
@@ -65,18 +67,40 @@ class Sniper extends Tower {
   }
 }
 
-class NormalTower extends Tower {
+// Medium Damage Tower with medium attack speed and range; purple in colouring.
+class MediumRange extends Tower {
   constructor(x, y, radius) {
     super(x, y, radius);
-    this.color = 'blue';
+    this.color = color(255, 0, 255);
+    this.rangeColor = color(255, 0, 255, 50);
     this.damage = 4;
-    this.range = 300;
+    this.range = 200;
     this.attackSpeed = 20;
     this.cooldown = 0;
   }
 
   display() {
-    fill(this.color);
+    super.display();
+  }
+
+  attack() {
+    super.attack();
+  }
+}
+
+// Low damage Tower with fast attack speed and low range; light blue in colouring.
+class CloseRange extends Tower {
+  constructor(x, y, radius) {
+    super(x, y, radius);
+    this.color = color(0, 255, 255);
+    this.rangeColor = color(0, 255, 255, 50);
+    this.damage = 0.3;
+    this.range = 100;
+    this.attackSpeed = 5;
+    this.cooldown = 0;
+  }
+
+  display() {
     super.display();
   }
 
@@ -161,7 +185,7 @@ class NormalEnemy extends Enemy {
     this.health = 10;
     this.speed = 1;
     this.damage = 1;
-    this.color = 'red';
+    this.color = color(255, 0, 0);
   }
 
   display() {
@@ -170,6 +194,27 @@ class NormalEnemy extends Enemy {
   }
   
   move() {
+    super.move();
+  }
+}
+
+// the Class for the fast enemies; enemies with 1000000 damage, low health, and very fast speed.
+class FastEnemy extends Enemy {
+  constructor(y) {
+    super(y);
+    this.health = 5;
+    this.speed = 1;
+    this.damage = 10;
+    this.color = color(229, 199, 50);
+  }
+
+  display() {
+    fill(this.color);
+    super.display();
+  }
+  
+  move() {
+    super.move();
     super.move();
   }
 }
@@ -206,7 +251,7 @@ function normalEnemyAI() {
     enemy.display();
     if (enemy.x === width) {
       enemyArray.splice(enemyIndex, 1);
-      playerHealth -= 1;
+      playerHealth -= enemy.damage;
     }
     if (enemy.health <= 0) {
       enemyArray.splice(enemyIndex, 1);
@@ -237,10 +282,14 @@ function drawPath() {
 }
 
 function keyPressed() {
-
-  let someEnemy = new NormalEnemy(Math.floor(height/2));
-  enemyArray.push(someEnemy);
-  
+  if (key === 'f') {
+    let someEnemy = new FastEnemy(Math.floor(height/2));
+    enemyArray.push(someEnemy);
+  }
+  else if (key === 'm') {
+    let someEnemy = new NormalEnemy(Math.floor(height/2));
+    enemyArray.push(someEnemy);
+  }
 }
 
 function towerAI() {
@@ -252,13 +301,18 @@ function towerAI() {
 
 function mousePressed() {
   if (keyIsDown(83) && money >= 100) {
-    let someTower = new Sniper(mouseX, mouseY, 10);
+    let someTower = new LongRange(mouseX, mouseY, 10);
     towerArray.push(someTower);
     money -= 100;
   }
   if (keyIsDown(78) && money >= 50) {
-    let someTower = new NormalTower(mouseX, mouseY, 10);
+    let someTower = new MediumRange(mouseX, mouseY, 10);
     towerArray.push(someTower);
     money -= 50;
+  }
+  if (keyIsDown(67) && money >= 20) {
+    let someTower = new CloseRange(mouseX, mouseY, 10);
+    towerArray.push(someTower);
+    money -= 20;
   }
 }
