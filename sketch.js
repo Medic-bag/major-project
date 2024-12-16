@@ -124,7 +124,7 @@ class Enemy {
   }
 
   move() {
-    if (this.x < width/10 - this.speed) {
+    if (this.x < Math.floor(width/10)) {
       this.x += this.speed;
     }
     else if (this.y < Math.floor(height/1.5) && this.x === Math.floor(width/10)) {
@@ -195,6 +195,26 @@ class NormalEnemy extends Enemy {
   
   move() {
     super.move();
+  }
+}
+
+class SlowEnemy extends Enemy {
+  constructor(y) {
+    super(y);
+    this.health = 25;
+    this.speed = 0.5;
+    this.damage = 1;
+    this.color = color(255, 0, 45);
+  }
+
+  display() {
+    fill(this.color);
+    super.display();
+  }
+  
+  move() {
+    super.move();
+    console.log(this.x);
   }
 }
 
@@ -288,6 +308,10 @@ function keyPressed() {
   }
   else if (key === 'm') {
     let someEnemy = new NormalEnemy(Math.floor(height/2));
+    enemyArray.push(someEnemy);
+  }
+  else if (key === 'p') {
+    let someEnemy = new SlowEnemy(Math.floor(height/2));
     enemyArray.push(someEnemy);
   }
 }
