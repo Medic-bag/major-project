@@ -3,7 +3,7 @@
 // January whenever, 2024
 //
 // Extra for Experts:
-// - describe what you did to take this project "above and beyond"
+// - Chase sucks at this game also.
 
 // to do list
 // Add to the ui
@@ -32,7 +32,8 @@ class Tower {
       this.cooldown++;
     }
     for (let enemy of enemyArray) {
-      if (dist(enemy.x, enemy.y, width, Math.floor(height/2)) > dist(enemyArray[closestEnemyIndex].x, enemyArray[closestEnemyIndex].y, width, Math.floor(height/2))) {
+
+      if (dist(enemy.x, enemy.y, width, Math.floor(height/2)) < dist(enemyArray[closestEnemyIndex].x, enemyArray[closestEnemyIndex].y, width, Math.floor(height/2))) {
         closestEnemyIndex = enemyArray.indexOf(enemy);
       }
       if (enemyArray.indexOf(enemy) === closestEnemyIndex && this.cooldown === this.attackSpeed && dist(enemyArray[closestEnemyIndex].x, enemyArray[closestEnemyIndex].y, this.x, this.y) < this.range) {
@@ -43,6 +44,7 @@ class Tower {
       }
     }
   }
+  
 }
 
 // High damage Tower with slow attack speed and high range; bisque in colouring. 
@@ -111,9 +113,9 @@ class CloseRange extends Tower {
 
 // Parent Class for the enemies.
 class Enemy {
-  constructor(y) {
+  constructor() {
     this.x = 0;
-    this.y = y;
+    this.y = Math.floor(height/2);
     this.radius = 10;
     this.speed = 1;
   }
@@ -180,12 +182,13 @@ class Enemy {
 
 // The Class for our 'normal' enemies; enemies with medium damage, speed and health to set a baseline for the other enemy types.
 class NormalEnemy extends Enemy {
-  constructor(y) {
-    super(y);
+  constructor() {
+    super();
     this.health = 10;
     this.speed = 1;
     this.damage = 1;
     this.color = color(255, 0, 0);
+    this.reward = 15;
   }
 
   display() {
@@ -199,12 +202,13 @@ class NormalEnemy extends Enemy {
 }
 
 class SlowEnemy extends Enemy {
-  constructor(y) {
-    super(y);
+  constructor() {
+    super();
     this.health = 25;
     this.speed = 0.5;
     this.damage = 1;
     this.color = color(255, 0, 45);
+    this.reward = 30;
   }
 
   display() {
@@ -214,18 +218,18 @@ class SlowEnemy extends Enemy {
   
   move() {
     super.move();
-    console.log(this.x);
   }
 }
 
-// the Class for the fast enemies; enemies with 1000000 damage, low health, and very fast speed.
+// The Class for the fast enemies; enemies with high damage, low health, and very fast speed.
 class FastEnemy extends Enemy {
-  constructor(y) {
-    super(y);
+  constructor() {
+    super();
     this.health = 5;
     this.speed = 1;
     this.damage = 10;
     this.color = color(229, 199, 50);
+    this.reward = 5;
   }
 
   display() {
@@ -235,6 +239,27 @@ class FastEnemy extends Enemy {
   
   move() {
     super.move();
+    super.move();
+  }
+}
+
+class BossEnemy extends Enemy {
+  constructor() {
+    super();
+    this.health = 250;
+    this.speed = 0.1;
+    this.damage = 50;
+    this.color = color(255, 165, 0);
+    this.reward = 200;
+  }
+
+  display() {
+    fill(this.color);
+    
+    super.display();
+  }
+  
+  move() {
     super.move();
   }
 }
@@ -244,6 +269,9 @@ let enemyArray = [];
 let playerHealth = 100;
 let towerArray = [];
 let money = 100;
+let round = 0;
+let directorCredits = 0;
+let roundRunning = false;
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
@@ -255,6 +283,7 @@ function draw() {
   normalEnemyAI();
   ui();
   towerAI();
+  directorAI();
 }
 
 function ui() {
@@ -275,7 +304,7 @@ function normalEnemyAI() {
     }
     if (enemy.health <= 0) {
       enemyArray.splice(enemyIndex, 1);
-      money += 50;
+      money += enemy.reward;
     }
   }
 }
@@ -314,6 +343,17 @@ function keyPressed() {
     let someEnemy = new SlowEnemy(Math.floor(height/2));
     enemyArray.push(someEnemy);
   }
+  else if (key === 'b') {
+    let someEnemy = new BossEnemy(Math.floor(height/2));
+    enemyArray.push(someEnemy);
+  }
+  if(keyCode === 32 && roundRunning === false) {
+    roundRunning = true;
+    round++;
+    if (directorCredits === 0) {
+      directorCredits = round * 15;
+    }
+  }
 }
 
 function towerAI() {
@@ -338,5 +378,33 @@ function mousePressed() {
     let someTower = new CloseRange(mouseX, mouseY, 10);
     towerArray.push(someTower);
     money -= 20;
+  }
+}
+
+function directorAI() {
+  if (roundRunning === true) {
+    let choice = random(3);
+    if (choice <= 1 && directorCredits >= 0.5) {
+      let someEnemy = new FastEnemy();
+      enemyArray.push(someEnemy);
+      directorCredits -= 0.5;
+    }
+    else if(choice <= 2 && directorCredits >= 2) {
+      let someEnemy = new NormalEnemy();
+      enemyArray.push(someEnemy);
+      directorCredits -= 2;
+    }
+    else if (choice < 3 && directorCredits >= 3) {
+      let someEnemy = new SlowEnemy();
+      enemyArray.push(someEnemy);
+      directorCredits -= 0.5;
+    }
+    else if (choice === 3){
+      let someEnemy = new BossEnemy();
+      enemyArray.push(someEnemy);
+    }
+  }
+  if (enemyArray.length === 0) {
+    roundRunning = false;
   }
 }
