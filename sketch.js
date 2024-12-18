@@ -3,10 +3,11 @@
 // January whenever, 2024
 //
 // Extra for Experts:
-// - Chase sucks at this game also.
+// - Riley sucks at this game also.
 
 // to do list
-// Add to the ui
+// collisoin with path
+// game over
 
 // Classes
 class Tower {
@@ -188,7 +189,7 @@ class NormalEnemy extends Enemy {
     this.speed = 1;
     this.damage = 1;
     this.color = color(255, 0, 0);
-    this.reward = 15;
+    this.reward = 5;
   }
 
   display() {
@@ -208,7 +209,7 @@ class SlowEnemy extends Enemy {
     this.speed = 0.5;
     this.damage = 1;
     this.color = color(255, 0, 45);
-    this.reward = 30;
+    this.reward = 10;
   }
 
   display() {
@@ -225,11 +226,11 @@ class SlowEnemy extends Enemy {
 class FastEnemy extends Enemy {
   constructor() {
     super();
-    this.health = 5;
+    this.health = 3;
     this.speed = 1;
     this.damage = 10;
     this.color = color(229, 199, 50);
-    this.reward = 5;
+    this.reward = 1;
   }
 
   display() {
@@ -244,13 +245,14 @@ class FastEnemy extends Enemy {
 }
 
 class BossEnemy extends Enemy {
-  constructor() {
-    super();
+  constructor(radius) {
+    super(radius);
     this.health = 250;
-    this.speed = 0.1;
+    this.speed = 0.25;
     this.damage = 50;
     this.color = color(255, 165, 0);
     this.reward = 200;
+    this.radius = this.radius *2;
   }
 
   display() {
@@ -261,6 +263,7 @@ class BossEnemy extends Enemy {
   
   move() {
     super.move();
+    console.log(this.x);
   }
 }
 
@@ -272,6 +275,7 @@ let money = 100;
 let round = 0;
 let directorCredits = 0;
 let roundRunning = false;
+let towerIsPlaceable = true;
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
@@ -280,6 +284,7 @@ function setup() {
 function draw() {
   background(0);
   drawPath();
+  noStroke();
   normalEnemyAI();
   ui();
   towerAI();
@@ -290,6 +295,7 @@ function ui() {
   fill('white');
   text('Health: ' + playerHealth, 10, 10);
   text('Money: ' + money, 10, 30);
+  text('Round: ' + round, 10, 50);
 }
 
 function normalEnemyAI() {
@@ -332,19 +338,19 @@ function drawPath() {
 
 function keyPressed() {
   if (key === 'f') {
-    let someEnemy = new FastEnemy(Math.floor(height/2));
+    let someEnemy = new FastEnemy();
     enemyArray.push(someEnemy);
   }
   else if (key === 'm') {
-    let someEnemy = new NormalEnemy(Math.floor(height/2));
+    let someEnemy = new NormalEnemy();
     enemyArray.push(someEnemy);
   }
   else if (key === 'p') {
-    let someEnemy = new SlowEnemy(Math.floor(height/2));
+    let someEnemy = new SlowEnemy();
     enemyArray.push(someEnemy);
   }
   else if (key === 'b') {
-    let someEnemy = new BossEnemy(Math.floor(height/2));
+    let someEnemy = new BossEnemy();
     enemyArray.push(someEnemy);
   }
   if(keyCode === 32 && roundRunning === false) {
@@ -364,17 +370,31 @@ function towerAI() {
 }
 
 function mousePressed() {
-  if (keyIsDown(83) && money >= 100) {
+  if (towerArray.length === 0) {
+    towerIsPlaceable = true;
+  }
+  else {
+    for (let tower of towerArray) {
+      if (dist(mouseX, mouseY, tower.x, tower.y) > 20) {
+        towerIsPlaceable = true;
+      }
+      else {
+        towerIsPlaceable = false;
+      }
+    }
+  }
+  
+  if (keyIsDown(83) && money >= 100 && towerIsPlaceable) {
     let someTower = new LongRange(mouseX, mouseY, 10);
     towerArray.push(someTower);
     money -= 100;
   }
-  if (keyIsDown(78) && money >= 50) {
+  if (keyIsDown(78) && money >= 50 && towerIsPlaceable) {
     let someTower = new MediumRange(mouseX, mouseY, 10);
     towerArray.push(someTower);
     money -= 50;
   }
-  if (keyIsDown(67) && money >= 20) {
+  if (keyIsDown(67) && money >= 20 && towerIsPlaceable) {
     let someTower = new CloseRange(mouseX, mouseY, 10);
     towerArray.push(someTower);
     money -= 20;
