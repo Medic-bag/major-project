@@ -3,11 +3,10 @@
 // January whenever, 2024
 //
 // Extra for Experts:
-// - Riley sucks at this game also.
+// - Chase sucks at this game also.
 
 // to do list
 // collisoin with path
-// game over
 
 // Classes
 class Tower {
@@ -97,7 +96,7 @@ class CloseRange extends Tower {
     super(x, y, radius);
     this.color = color(0, 255, 255);
     this.rangeColor = color(0, 255, 255, 50);
-    this.damage = 0.3;
+    this.damage = 0.7;
     this.range = 100;
     this.attackSpeed = 5;
     this.cooldown = 0;
@@ -189,7 +188,7 @@ class NormalEnemy extends Enemy {
     this.speed = 1;
     this.damage = 1;
     this.color = color(255, 0, 0);
-    this.reward = 5;
+    this.reward = 1;
   }
 
   display() {
@@ -207,9 +206,9 @@ class SlowEnemy extends Enemy {
     super();
     this.health = 25;
     this.speed = 0.5;
-    this.damage = 1;
+    this.damage = 5;
     this.color = color(255, 0, 45);
-    this.reward = 10;
+    this.reward = 7;
   }
 
   display() {
@@ -228,9 +227,9 @@ class FastEnemy extends Enemy {
     super();
     this.health = 3;
     this.speed = 1;
-    this.damage = 10;
+    this.damage = 100;
     this.color = color(229, 199, 50);
-    this.reward = 1;
+    this.reward = 3;
   }
 
   display() {
@@ -244,6 +243,7 @@ class FastEnemy extends Enemy {
   }
 }
 
+// The Class for our Boss enemy; Has lots of health, damage, but extremely slow. (also fat)
 class BossEnemy extends Enemy {
   constructor(radius) {
     super(radius);
@@ -252,7 +252,7 @@ class BossEnemy extends Enemy {
     this.damage = 50;
     this.color = color(255, 165, 0);
     this.reward = 200;
-    this.radius = this.radius *2;
+    this.radius = this.radius * 5;
   }
 
   display() {
@@ -276,6 +276,8 @@ let round = 0;
 let directorCredits = 0;
 let roundRunning = false;
 let towerIsPlaceable = true;
+let gameOver = false;
+
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
@@ -283,14 +285,10 @@ function setup() {
 
 function draw() {
   background(0);
-  drawPath();
-  noStroke();
-  normalEnemyAI();
-  ui();
-  towerAI();
-  directorAI();
+  runGame();
 }
 
+// Displays the UI for when the game is running.
 function ui() {
   fill('white');
   text('Health: ' + playerHealth, 10, 10);
@@ -298,16 +296,19 @@ function ui() {
   text('Round: ' + round, 10, 50);
 }
 
+// Runs the basic ai for the enemies, displaying and moving them as well as making them deal and take damage.
 function normalEnemyAI() {
   for (let enemy of enemyArray) {
     let enemyIndex = enemyArray.indexOf(enemy);
     enemy.move();
     enemy.move();
     enemy.display();
+
     if (enemy.x === width) {
       enemyArray.splice(enemyIndex, 1);
       playerHealth -= enemy.damage;
     }
+
     if (enemy.health <= 0) {
       enemyArray.splice(enemyIndex, 1);
       money += enemy.reward;
@@ -315,53 +316,48 @@ function normalEnemyAI() {
   }
 }
 
+// Draws the path that enemies follow.
 function drawPath() {
   stroke('white');
   line(0, Math.floor(height/2),  Math.floor(width/10), Math.floor(height/2));
   line(Math.floor(width/10), Math.floor(height/2), Math.floor(width/10), Math.floor(height/1.5));
+
   line(Math.floor(width/10), Math.floor(height/1.5), Math.floor(width/5), Math.floor(height/1.5));
   line(Math.floor(width/5), Math.floor(height/1.5), Math.floor(width/5), Math.floor(height/3));
+
   line(Math.floor(width/5), Math.floor(height/3), Math.floor(width/10 * 3), Math.floor(height/3));
   line(Math.floor(width/10 * 3), Math.floor(height/3), Math.floor(width/10 * 3), Math.floor(height/1.25));
+
   line(Math.floor(width/10 * 3), Math.floor(height/1.25), Math.floor(width/5 * 2), Math.floor(height/1.25));
   line(Math.floor(width/5 * 2), Math.floor(height/1.25), Math.floor(width/5 * 2), Math.floor(height/4));
+
   line(Math.floor(width/5 * 2), Math.floor(height/4), Math.floor(width/5 * 3), Math.floor(height/4));
   line(Math.floor(width/5 * 3), Math.floor(height/4), Math.floor(width/5 * 3), Math.floor(height/1.25));
+
   line(Math.floor(width/5 * 3), Math.floor(height/1.25), Math.floor(width/10 * 7), Math.floor(height/1.25));
   line(Math.floor(width/10 * 7), Math.floor(height/1.25), Math.floor(width/10 * 7), Math.floor(height/3));
+
   line(Math.floor(width/10 * 7), Math.floor(height/3), Math.floor(width/5 * 4), Math.floor(height/3));
   line(Math.floor(width/5 * 4), Math.floor(height/3), Math.floor(width/5 * 4), Math.floor(height/1.5));
+
   line(Math.floor(width/5 * 4), Math.floor(height/1.5), Math.floor(width/10 * 9), Math.floor(height/1.5));
   line(Math.floor(width/10 * 9), Math.floor(height/1.5), Math.floor(width/10 * 9), Math.floor(height/2));
   line(Math.floor(width/10 * 9), Math.floor(height/2), width, Math.floor(height/2));
 }
 
+// Starts a round when the space bar is pressed, as long as there isn't a round already running.
 function keyPressed() {
-  if (key === 'f') {
-    let someEnemy = new FastEnemy();
-    enemyArray.push(someEnemy);
-  }
-  else if (key === 'm') {
-    let someEnemy = new NormalEnemy();
-    enemyArray.push(someEnemy);
-  }
-  else if (key === 'p') {
-    let someEnemy = new SlowEnemy();
-    enemyArray.push(someEnemy);
-  }
-  else if (key === 'b') {
-    let someEnemy = new BossEnemy();
-    enemyArray.push(someEnemy);
-  }
-  if(keyCode === 32 && roundRunning === false) {
+  if(keyCode === 32 && roundRunning === false && gameOver === false) {
     roundRunning = true;
     round++;
+
     if (directorCredits === 0) {
       directorCredits = round * 15;
     }
   }
 }
 
+// Runs the basic ai for the towers allowing all of the towers to attack and be displayed.
 function towerAI() {
   for (let tower of towerArray) {
     tower.display();
@@ -369,62 +365,116 @@ function towerAI() {
   }
 }
 
+// Spawns a tower at the mouse position if you are holding down a key that is designated to a tower.
 function mousePressed() {
-  if (towerArray.length === 0) {
-    towerIsPlaceable = true;
-  }
-  else {
-    for (let tower of towerArray) {
-      if (dist(mouseX, mouseY, tower.x, tower.y) > 20) {
-        towerIsPlaceable = true;
-      }
-      else {
-        towerIsPlaceable = false;
+  if (gameOver === false) {
+    if (towerArray.length === 0) {
+      towerIsPlaceable = true;
+    }
+    
+    else {
+      for (let tower of towerArray) {
+        if (dist(mouseX, mouseY, tower.x, tower.y) > 20) {
+          towerIsPlaceable = true;
+        }
+        else {
+          towerIsPlaceable = false;
+        }
       }
     }
+    
+    if (keyIsDown(83) && money >= 100 && towerIsPlaceable) {
+      let someTower = new LongRange(mouseX, mouseY, 10);
+      towerArray.push(someTower);
+      money -= 100;
+    }
+    
+    if (keyIsDown(78) && money >= 50 && towerIsPlaceable) {
+      let someTower = new MediumRange(mouseX, mouseY, 10);
+      towerArray.push(someTower);
+      money -= 50;
+    }
+    
+    if (keyIsDown(67) && money >= 20 && towerIsPlaceable) {
+      let someTower = new CloseRange(mouseX, mouseY, 10);
+      towerArray.push(someTower);
+      money -= 20;
+    }
   }
-  
-  if (keyIsDown(83) && money >= 100 && towerIsPlaceable) {
-    let someTower = new LongRange(mouseX, mouseY, 10);
-    towerArray.push(someTower);
-    money -= 100;
-  }
-  if (keyIsDown(78) && money >= 50 && towerIsPlaceable) {
-    let someTower = new MediumRange(mouseX, mouseY, 10);
-    towerArray.push(someTower);
-    money -= 50;
-  }
-  if (keyIsDown(67) && money >= 20 && towerIsPlaceable) {
-    let someTower = new CloseRange(mouseX, mouseY, 10);
-    towerArray.push(someTower);
-    money -= 20;
+  else {
+    resetGame();
   }
 }
 
+// Uses up credits, which are given at the start of each round, to choose a random selection of enemies for each round.
 function directorAI() {
   if (roundRunning === true) {
-    let choice = random(3);
-    if (choice <= 1 && directorCredits >= 0.5) {
+    let choice = random(10);
+    if (choice <= 2 && directorCredits >= 0.5) {
       let someEnemy = new FastEnemy();
       enemyArray.push(someEnemy);
       directorCredits -= 0.5;
     }
-    else if(choice <= 2 && directorCredits >= 2) {
+    
+    else if(choice <= 7 && directorCredits >= 2) {
       let someEnemy = new NormalEnemy();
       enemyArray.push(someEnemy);
       directorCredits -= 2;
     }
-    else if (choice < 3 && directorCredits >= 3) {
+    
+    else if (choice < 10 && directorCredits >= 3) {
       let someEnemy = new SlowEnemy();
       enemyArray.push(someEnemy);
       directorCredits -= 0.5;
     }
-    else if (choice === 3){
+    
+    else if (choice === 10){
       let someEnemy = new BossEnemy();
       enemyArray.push(someEnemy);
     }
+    
   }
   if (enemyArray.length === 0) {
     roundRunning = false;
   }
 }
+
+// 
+function resetGame() {
+  enemyArray = [];
+  playerHealth = 100;
+  towerArray = [];
+  money = 100;
+  round = 0;
+  directorCredits = 0;
+  roundRunning = false;
+  towerIsPlaceable = true;
+  gameOver = false;
+}
+
+// Runs all of the necessary functions for the game as long as the gameOver variable is false, otherwise runs the endGameUI function. 
+function runGame() {
+  if (gameOver === false) {
+    drawPath();
+    noStroke();
+    normalEnemyAI();
+    ui();
+    towerAI();
+    directorAI();
+    if (playerHealth <= 0) {
+      gameOver = true;
+    }
+  }
+  else {
+    endGameUI();
+  }
+}
+
+// Shows the game over screen.
+function endGameUI() {
+  noStroke();
+  fill('white');
+  text('GAME OVER', width/2 - 10, height/2);
+  text('LEFT CLICK TO RESTART', width/2 - 45, height/2 + 20);
+}
+
