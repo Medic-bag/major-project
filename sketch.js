@@ -32,9 +32,10 @@ class Tower {
       this.cooldown++;
     }
     for (let enemy of enemyArray) {
-
       if (dist(enemy.x, enemy.y, width, Math.floor(height/2)) < dist(enemyArray[closestEnemyIndex].x, enemyArray[closestEnemyIndex].y, width, Math.floor(height/2))) {
         closestEnemyIndex = enemyArray.indexOf(enemy);
+        console.log('e ' + dist(enemy.x, enemy.y, width, Math.floor(height/2)));
+        console.log('c ' + dist(enemyArray[closestEnemyIndex].x, enemyArray[closestEnemyIndex].y, width, Math.floor(height/2)));
       }
       if (enemyArray.indexOf(enemy) === closestEnemyIndex && this.cooldown === this.attackSpeed && dist(enemyArray[closestEnemyIndex].x, enemyArray[closestEnemyIndex].y, this.x, this.y) < this.range) {
         stroke(this.color);
@@ -44,7 +45,6 @@ class Tower {
       }
     }
   }
-  
 }
 
 // High damage Tower with slow attack speed and high range; bisque in colouring. 
@@ -60,7 +60,6 @@ class LongRange extends Tower {
   }
 
   display() {
-    
     super.display();
   }
 
@@ -227,7 +226,7 @@ class FastEnemy extends Enemy {
     super();
     this.health = 3;
     this.speed = 1;
-    this.damage = 100;
+    this.damage = 1;
     this.color = color(229, 199, 50);
     this.reward = 3;
   }
@@ -277,6 +276,10 @@ let directorCredits = 0;
 let roundRunning = false;
 let towerIsPlaceable = true;
 let gameOver = false;
+let firstPathValueArray = [10, 10, 5, 5, 3/10, 3/10, 2/5, 2/5, 3/5, 3/5, 7/10, 7/10, 4/5, 4/5, 9/10];
+let secondPathValueArray = [2, 1.5, 1.5, 3, 3, 1.25, 1.25, 4, 4, 1.25, 1.25, 3, 3, 1.5, 1.5];
+let thirdPathValueArray = [10, 5, 5, 3/10, 3/10, 2/5, 2/5, 3/5, 3/5, 7/10, 7/10, 4/5, 4/5, 9/10, 9/10];
+let fourthPathValueArray = [1.5, 1.5, 3, 3, 1.25, 1.25, 4, 4, 1.25, 1.25, 3, 3, 1.5, 1.5, 2];
 
 
 function setup() {
