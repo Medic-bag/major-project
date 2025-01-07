@@ -32,12 +32,11 @@ class Tower {
       this.cooldown++;
     }
     for (let enemy of enemyArray) {
-      if (dist(enemy.x, enemy.y, width, Math.floor(height/2)) < dist(enemyArray[closestEnemyIndex].x, enemyArray[closestEnemyIndex].y, width, Math.floor(height/2))) {
+      if (enemy.traveled > enemyArray[closestEnemyIndex].traveled && dist(this.x, this.y, enemyArray[closestEnemyIndex].x, enemyArray[closestEnemyIndex].y)) {
         closestEnemyIndex = enemyArray.indexOf(enemy);
-        console.log('e ' + dist(enemy.x, enemy.y, width, Math.floor(height/2)));
-        console.log('c ' + dist(enemyArray[closestEnemyIndex].x, enemyArray[closestEnemyIndex].y, width, Math.floor(height/2)));
+        console.log(enemyArray[closestEnemyIndex]);
       }
-      if (enemyArray.indexOf(enemy) === closestEnemyIndex && this.cooldown === this.attackSpeed && dist(enemyArray[closestEnemyIndex].x, enemyArray[closestEnemyIndex].y, this.x, this.y) < this.range) {
+      if (enemyArray.indexOf(enemy) === closestEnemyIndex && this.cooldown === this.attackSpeed && dist(enemyArray[closestEnemyIndex].x, enemyArray[closestEnemyIndex].y, this.x, this.y) <= this.range) {
         stroke(this.color);
         line(enemy.x, enemy.y, this.x, this.y);
         enemy.health -= this.damage;
@@ -117,6 +116,7 @@ class Enemy {
     this.y = Math.floor(height/2);
     this.radius = 10;
     this.speed = 1;
+    this.traveled = 0;
   }
 
   display() {
@@ -176,6 +176,7 @@ class Enemy {
     else if (this.x < width && this.y === Math.floor(height/2)) {
       this.x += this.speed;
     }
+    this.traveled += this.speed;
   }
 }
 
@@ -256,13 +257,11 @@ class BossEnemy extends Enemy {
 
   display() {
     fill(this.color);
-    
     super.display();
   }
   
   move() {
     super.move();
-    console.log(this.x);
   }
 }
 
@@ -276,10 +275,10 @@ let directorCredits = 0;
 let roundRunning = false;
 let towerIsPlaceable = true;
 let gameOver = false;
-let firstPathValueArray = [10, 10, 5, 5, 3/10, 3/10, 2/5, 2/5, 3/5, 3/5, 7/10, 7/10, 4/5, 4/5, 9/10];
-let secondPathValueArray = [2, 1.5, 1.5, 3, 3, 1.25, 1.25, 4, 4, 1.25, 1.25, 3, 3, 1.5, 1.5];
-let thirdPathValueArray = [10, 5, 5, 3/10, 3/10, 2/5, 2/5, 3/5, 3/5, 7/10, 7/10, 4/5, 4/5, 9/10, 9/10];
-let fourthPathValueArray = [1.5, 1.5, 3, 3, 1.25, 1.25, 4, 4, 1.25, 1.25, 3, 3, 1.5, 1.5, 2];
+let firstPathXArray = [0.1, 0.1, 0.2, 0.2, 0.3, 0.3, 0.4, 0.4, 0.6, 0.6, 0.7, 0.7, 0.8, 0.8, 0.9];
+let firstPathYArray = [2, 1.5, 1.5, 3, 3, 1.25, 1.25, 4, 4, 1.25, 1.25, 3, 3, 1.5, 1.5];
+let secondPathXArray = [0.1, 0.2, 0.2, 0.3, 0.3, 0.4, 0.4, 0.6, 0.6, 0.7, 0.7, 0.8, 0.8, 0.9, 0.9];
+let secondPathYArray = [1.5, 1.5, 3, 3, 1.25, 1.25, 4, 4, 1.25, 1.25, 3, 3, 1.5, 1.5, 2];
 
 
 function setup() {
@@ -322,34 +321,9 @@ function normalEnemyAI() {
 // Draws the path that enemies follow.
 function drawPath() {
   stroke('white');
-  // line(0, Math.floor(height/2),  Math.floor(width/10), Math.floor(height/2));
-  // line(Math.floor(width/10), Math.floor(height/2), Math.floor(width/10), Math.floor(height/1.5));
-
-  // line(Math.floor(width/10), Math.floor(height/1.5), Math.floor(width/5), Math.floor(height/1.5));
-  // line(Math.floor(width/5), Math.floor(height/1.5), Math.floor(width/5), Math.floor(height/3));
-
-  // line(Math.floor(width/5), Math.floor(height/3), Math.floor(width/10 * 3), Math.floor(height/3));
-  // line(Math.floor(width/10 * 3), Math.floor(height/3), Math.floor(width/10 * 3), Math.floor(height/1.25));
-
-  // line(Math.floor(width/10 * 3), Math.floor(height/1.25), Math.floor(width/5 * 2), Math.floor(height/1.25));
-  // line(Math.floor(width/5 * 2), Math.floor(height/1.25), Math.floor(width/5 * 2), Math.floor(height/4));
-
-  // line(Math.floor(width/5 * 2), Math.floor(height/4), Math.floor(width/5 * 3), Math.floor(height/4));
-  // line(Math.floor(width/5 * 3), Math.floor(height/4), Math.floor(width/5 * 3), Math.floor(height/1.25));
-
-  // line(Math.floor(width/5 * 3), Math.floor(height/1.25), Math.floor(width/10 * 7), Math.floor(height/1.25));
-  // line(Math.floor(width/10 * 7), Math.floor(height/1.25), Math.floor(width/10 * 7), Math.floor(height/3));
-
-  // line(Math.floor(width/10 * 7), Math.floor(height/3), Math.floor(width/5 * 4), Math.floor(height/3));
-  // line(Math.floor(width/5 * 4), Math.floor(height/3), Math.floor(width/5 * 4), Math.floor(height/1.5));
-
-  // line(Math.floor(width/5 * 4), Math.floor(height/1.5), Math.floor(width/10 * 9), Math.floor(height/1.5));
-  // line(Math.floor(width/10 * 9), Math.floor(height/1.5), Math.floor(width/10 * 9), Math.floor(height/2));
-  // line(Math.floor(width/10 * 9), Math.floor(height/2), width, Math.floor(height/2));
-
   line(0, Math.floor(height/2),  Math.floor(width/10), Math.floor(height/2));
   for (let i = 0; i < 15; i++) {
-    line(Math.floor(width/firstPathValueArray[i]), Math.floor(height/secondPathValueArray[i]), Math.floor(width/thirdPathValueArray[i]), Math.floor(height/fourthPathValueArray[i]));
+    line(Math.floor(width * firstPathXArray[i]), Math.floor(height/firstPathYArray[i]), Math.floor(width * secondPathXArray[i]), Math.floor(height/secondPathYArray[i]));
   }
   line(Math.floor(width/10 * 9), Math.floor(height/2), width, Math.floor(height/2));
 }
