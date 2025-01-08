@@ -32,9 +32,10 @@ class Tower {
       this.cooldown++;
     }
     for (let enemy of enemyArray) {
-      if (enemy.traveled > enemyArray[closestEnemyIndex].traveled && dist(this.x, this.y, enemyArray[closestEnemyIndex].x, enemyArray[closestEnemyIndex].y)) {
+      console.log(enemy.traveled);
+      console.log(closestEnemyIndex);
+      if (enemy.traveled  > enemyArray[closestEnemyIndex].traveled  && dist(this.x, this.y, enemyArray[closestEnemyIndex].x, enemyArray[closestEnemyIndex].y)) {
         closestEnemyIndex = enemyArray.indexOf(enemy);
-        console.log(enemyArray[closestEnemyIndex]);
       }
       if (enemyArray.indexOf(enemy) === closestEnemyIndex && this.cooldown === this.attackSpeed && dist(enemyArray[closestEnemyIndex].x, enemyArray[closestEnemyIndex].y, this.x, this.y) <= this.range) {
         stroke(this.color);
@@ -122,6 +123,9 @@ class Enemy {
   display() {
     noStroke();
     circle(this.x, this.y, this.radius);
+    // if (dist(mouseX, mouseY, this.x, this.y) <= this.radius) {
+    //   console.log(this.traveled * this.speed);
+    // }
   }
 
   move() {
@@ -356,13 +360,17 @@ function mousePressed() {
     }
     
     else {
+      let towerCounter = 0;
       for (let tower of towerArray) {
         if (dist(mouseX, mouseY, tower.x, tower.y) > 20) {
-          towerIsPlaceable = true;
+          towerCounter++;
         }
-        else {
-          towerIsPlaceable = false;
-        }
+      }
+      if (towerCounter === towerArray.length) {
+        towerIsPlaceable = true;
+      }
+      else {
+        towerIsPlaceable = false;
       }
     }
     
