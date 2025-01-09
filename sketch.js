@@ -32,8 +32,6 @@ class Tower {
       this.cooldown++;
     }
     for (let enemy of enemyArray) {
-      console.log(enemy.traveled);
-      console.log(closestEnemyIndex);
       if (enemy.traveled  > enemyArray[closestEnemyIndex].traveled  && dist(this.x, this.y, enemyArray[closestEnemyIndex].x, enemyArray[closestEnemyIndex].y)) {
         closestEnemyIndex = enemyArray.indexOf(enemy);
       }
@@ -180,7 +178,6 @@ class Enemy {
     else if (this.x < width && this.y === Math.floor(height/2)) {
       this.x += this.speed;
     }
-    this.traveled += this.speed;
   }
 }
 
@@ -202,6 +199,7 @@ class NormalEnemy extends Enemy {
   
   move() {
     super.move();
+    this.traveled += 500;
   }
 }
 
@@ -222,6 +220,7 @@ class SlowEnemy extends Enemy {
   
   move() {
     super.move();
+    this.traveled += 0.1;
   }
 }
 
@@ -244,6 +243,7 @@ class FastEnemy extends Enemy {
   move() {
     super.move();
     super.move();
+    this.traveled += 5000;
   }
 }
 
