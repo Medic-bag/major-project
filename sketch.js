@@ -27,15 +27,16 @@ class Tower {
   }
 
   attack() {
-    let closestEnemyIndex = 0;
+    let furthestEnemyIndex = 0;
     if (this.cooldown < this.attackSpeed) {
       this.cooldown++;
     }
     for (let enemy of enemyArray) {
-      if (enemy.traveled  > enemyArray[closestEnemyIndex].traveled  && dist(this.x, this.y, enemyArray[closestEnemyIndex].x, enemyArray[closestEnemyIndex].y)) {
-        closestEnemyIndex = enemyArray.indexOf(enemy);
+      if (enemy.traveled  > enemyArray[furthestEnemyIndex].traveled && dist(enemy.x, enemy.y, enemyArray[furthestEnemyIndex].x, enemyArray[furthestEnemyIndex].y) < this.range) {
+        furthestEnemyIndex = enemyArray.indexOf(enemy);
+        console.log(enemyArray[furthestEnemyIndex].traveled);
       }
-      if (enemyArray.indexOf(enemy) === closestEnemyIndex && this.cooldown === this.attackSpeed && dist(enemyArray[closestEnemyIndex].x, enemyArray[closestEnemyIndex].y, this.x, this.y) <= this.range) {
+      if (enemyArray.indexOf(enemy) === furthestEnemyIndex && this.cooldown === this.attackSpeed && dist(enemyArray[furthestEnemyIndex].x, enemyArray[furthestEnemyIndex].y, this.x, this.y) <= this.range) {
         stroke(this.color);
         line(enemy.x, enemy.y, this.x, this.y);
         enemy.health -= this.damage;
@@ -52,7 +53,7 @@ class LongRange extends Tower {
     this.color = color(242, 210, 189);
     this.rangeColor = color(242, 210, 189, 50);
     this.damage = 10;
-    this.range = 500;
+    this.range = width/3;
     this.attackSpeed = 60;
     this.cooldown = 0;
   }
@@ -72,8 +73,8 @@ class MediumRange extends Tower {
     super(x, y, radius);
     this.color = color(255, 0, 255);
     this.rangeColor = color(255, 0, 255, 50);
-    this.damage = 4;
-    this.range = 200;
+    this.damage = 5;
+    this.range = width/4;
     this.attackSpeed = 20;
     this.cooldown = 0;
   }
@@ -94,7 +95,7 @@ class CloseRange extends Tower {
     this.color = color(0, 255, 255);
     this.rangeColor = color(0, 255, 255, 50);
     this.damage = 0.7;
-    this.range = 100;
+    this.range = width/10;
     this.attackSpeed = 5;
     this.cooldown = 0;
   }
@@ -114,16 +115,11 @@ class Enemy {
     this.x = 0;
     this.y = Math.floor(height/2);
     this.radius = 10;
-    this.speed = 1;
-    this.traveled = 0;
   }
 
   display() {
     noStroke();
     circle(this.x, this.y, this.radius);
-    // if (dist(mouseX, mouseY, this.x, this.y) <= this.radius) {
-    //   console.log(this.traveled * this.speed);
-    // }
   }
 
   move() {
@@ -190,6 +186,7 @@ class NormalEnemy extends Enemy {
     this.damage = 1;
     this.color = color(255, 0, 0);
     this.reward = 1;
+    this.traveled = 0;
   }
 
   display() {
@@ -200,6 +197,7 @@ class NormalEnemy extends Enemy {
   move() {
     super.move();
     this.traveled += 500;
+    console.log( "n" + this.traveled);
   }
 }
 
@@ -211,6 +209,7 @@ class SlowEnemy extends Enemy {
     this.damage = 5;
     this.color = color(255, 0, 45);
     this.reward = 7;
+    this.traveled = 0;
   }
 
   display() {
@@ -220,7 +219,8 @@ class SlowEnemy extends Enemy {
   
   move() {
     super.move();
-    this.traveled += 0.1;
+    this.traveled += 1;
+    console.log("s" + this.traveled);
   }
 }
 
@@ -233,6 +233,7 @@ class FastEnemy extends Enemy {
     this.damage = 1;
     this.color = color(229, 199, 50);
     this.reward = 3;
+    this.traveled = 0;
   }
 
   display() {
@@ -244,6 +245,7 @@ class FastEnemy extends Enemy {
     super.move();
     super.move();
     this.traveled += 5000;
+    console.log("f" + this.traveled);
   }
 }
 
@@ -342,18 +344,7 @@ function keyPressed() {
       directorCredits = round * 15;
     }
   }
-}
 
-// Runs the basic ai for the towers allowing all of the towers to attack and be displayed.
-function towerAI() {
-  for (let tower of towerArray) {
-    tower.display();
-    tower.attack();
-  }
-}
-
-// Spawns a tower at the mouse position if you are holding down a key that is designated to a tower.
-function mousePressed() {
   if (gameOver === false) {
     if (towerArray.length === 0) {
       towerIsPlaceable = true;
@@ -374,19 +365,19 @@ function mousePressed() {
       }
     }
     
-    if (keyIsDown(83) && money >= 100 && towerIsPlaceable) {
+    if (keyCode === 49 && money >= 100 && towerIsPlaceable) {
       let someTower = new LongRange(mouseX, mouseY, 10);
       towerArray.push(someTower);
       money -= 100;
     }
     
-    if (keyIsDown(78) && money >= 50 && towerIsPlaceable) {
+    if (keyCode === 50 && money >= 50 && towerIsPlaceable) {
       let someTower = new MediumRange(mouseX, mouseY, 10);
       towerArray.push(someTower);
       money -= 50;
     }
     
-    if (keyIsDown(67) && money >= 20 && towerIsPlaceable) {
+    if (keyCode === 51 && money >= 20 && towerIsPlaceable) {
       let someTower = new CloseRange(mouseX, mouseY, 10);
       towerArray.push(someTower);
       money -= 20;
@@ -395,6 +386,19 @@ function mousePressed() {
   else {
     resetGame();
   }
+}
+
+// Runs the basic ai for the towers allowing all of the towers to attack and be displayed.
+function towerAI() {
+  for (let tower of towerArray) {
+    tower.display();
+    tower.attack();
+  }
+}
+
+// Spawns a tower at the mouse position if you are holding down a key that is designated to a tower.
+function mousePressed() {
+
 }
 
 // Uses up credits, which are given at the start of each round, to choose a random selection of enemies for each round.
@@ -448,9 +452,9 @@ function runGame() {
   if (gameOver === false) {
     drawPath();
     noStroke();
+    towerAI();
     normalEnemyAI();
     ui();
-    towerAI();
     directorAI();
     if (playerHealth <= 0) {
       gameOver = true;
@@ -469,3 +473,57 @@ function endGameUI() {
   text('LEFT CLICK TO RESTART', width/2 - 45, height/2 + 20);
 }
 
+
+
+
+// attack() {
+//   2
+//      let farthestEnemyIndex = -1;
+//   3
+//      let maxTraveled = -1;
+//   4
+   
+//   5
+//      // Find the farthest enemy
+//   6
+//      for (let i = 0; i < enemyArray.length; i++) {
+//   7
+//        if (enemyArray[i].traveled > maxTraveled) {
+//   8
+//          maxTraveled = enemyArray[i].traveled;
+//   9
+//          farthestEnemyIndex = i;
+//  10
+//        }
+//  11
+//      }
+//  12
+   
+//  13
+//      // Attack the farthest enemy if within range and cooldown is complete
+//  14
+//      if (farthestEnemyIndex !== -1 && this.cooldown >= this.attackSpeed) {
+//  15
+//        let farthestEnemy = enemyArray[farthestEnemyIndex];
+//  16
+//        if (dist(farthestEnemy.x, farthestEnemy.y, this.x, this.y) <= this.range) {
+//  17
+//          stroke(this.color);
+//  18
+//          line(farthestEnemy.x, farthestEnemy.y, this.x, this.y);
+//  19
+//          farthestEnemy.health -= this.damage;
+//  20
+//          this.cooldown = 0;
+//  21
+//        }
+//  22
+//      }
+//  23
+//      else {
+//  24
+//        this.cooldown++;
+//  25
+//      }
+//  26
+//    }
