@@ -3,12 +3,13 @@
 // January whenever, 2024
 //
 // Extra for Experts:
-// - Chase sucks at this game.
+// - 
 
 // to do list
 // collisoin with path
 
 // Classes
+// 
 class Tower {
   constructor(x, y, radius) {
     this.x = x;
@@ -209,6 +210,7 @@ class NormalEnemy extends Enemy {
   }
 }
 
+//
 class SlowEnemy extends Enemy {
   constructor() {
     super();
@@ -237,7 +239,7 @@ class FastEnemy extends Enemy {
     super();
     this.health = 3 + round;
     this.speed = 1;
-    this.damage = 1;
+    this.damage = 3;
     this.color = color(229, 199, 50);
     this.reward = 3;
     this.traveled = 0;
@@ -255,7 +257,7 @@ class FastEnemy extends Enemy {
   }
 }
 
-// The Class for our Boss enemy; Has lots of health, damage, but extremely slow. (also fat)
+// The Class for our Boss enemy; Has lots of health, damage, but extremely slow.
 class BossEnemy extends Enemy {
   constructor(radius) {
     super(radius);
@@ -293,7 +295,7 @@ let firstPathXArray = [0.1, 0.1, 0.2, 0.2, 0.3, 0.3, 0.4, 0.4, 0.6, 0.6, 0.7, 0.
 let firstPathYArray = [2, 1.5, 1.5, 3, 3, 1.25, 1.25, 4, 4, 1.25, 1.25, 3, 3, 1.5, 1.5];
 let secondPathXArray = [0.1, 0.2, 0.2, 0.3, 0.3, 0.4, 0.4, 0.6, 0.6, 0.7, 0.7, 0.8, 0.8, 0.9, 0.9];
 let secondPathYArray = [1.5, 1.5, 3, 3, 1.25, 1.25, 4, 4, 1.25, 1.25, 3, 3, 1.5, 1.5, 2];
-
+let bossCounter = 0;
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
@@ -395,6 +397,21 @@ function keyPressed() {
     towerArray.push(someTower);
     money -= 20;
   }
+  
+  if (keyCode === 72) {
+    round += 19;
+    money = 10000;
+  }
+}
+
+// Sells a tower when you click on it.
+function mousePressed() {
+  for (let tower of towerArray) {
+    let index = towerArray.indexOf(tower);
+    if (dist(mouseX, mouseY, tower.x, tower.y) <= tower.radius) {
+      towerArray.splice(index, 1);
+    }
+  }
 }
 
 // Runs the basic ai for the towers allowing all of the towers to attack and be displayed.
@@ -427,20 +444,21 @@ function directorAI() {
       directorCredits -= 0.5;
     }
     
-    else if (choice === 10 || round % 20 === 0 && directorCredits > 0){
+    else if (choice === 10 || round % 20 === 0 && bossCounter < round/20){
       let someEnemy = new BossEnemy();
       enemyArray.push(someEnemy);
-
+      bossCounter++;
     }
     
   }
   if (enemyArray.length === 0) {
     roundRunning = false;
+    bossCounter = 0;
   }
 
 }
 
-// 
+// Restarts the game when you click on the game over screen. 
 function resetGame() {
   enemyArray = [];
   playerHealth = 100;
