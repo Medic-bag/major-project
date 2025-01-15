@@ -9,7 +9,8 @@
 // collisoin with path
 
 // Classes
-// 
+
+// Parent class for the towers.
 class Tower {
   constructor(x, y, radius) {
     this.x = x;
@@ -66,6 +67,7 @@ class LongRange extends Tower {
     this.range = width/3.5;
     this.attackSpeed = 60;
     this.cooldown = 0;
+    this.cost = 100;
   }
 
   display() {
@@ -87,6 +89,7 @@ class MediumRange extends Tower {
     this.range = width/6;
     this.attackSpeed = 20;
     this.cooldown = 0;
+    this.cost = 50;
   }
 
   display() {
@@ -108,6 +111,7 @@ class CloseRange extends Tower {
     this.range = width/12;
     this.attackSpeed = 5;
     this.cooldown = 0;
+    this.cost = 20;
   }
 
   display() {
@@ -210,7 +214,7 @@ class NormalEnemy extends Enemy {
   }
 }
 
-//
+// The Class for the slow enemies; enemies with high health, the highest damage, and lower speed.
 class SlowEnemy extends Enemy {
   constructor() {
     super();
@@ -291,11 +295,11 @@ let directorCredits = 0;
 let roundRunning = false;
 let towerIsPlaceable = true;
 let gameOver = false;
-let firstPathXArray = [0.1, 0.1, 0.2, 0.2, 0.3, 0.3, 0.4, 0.4, 0.6, 0.6, 0.7, 0.7, 0.8, 0.8, 0.9];
-let firstPathYArray = [2, 1.5, 1.5, 3, 3, 1.25, 1.25, 4, 4, 1.25, 1.25, 3, 3, 1.5, 1.5];
-let secondPathXArray = [0.1, 0.2, 0.2, 0.3, 0.3, 0.4, 0.4, 0.6, 0.6, 0.7, 0.7, 0.8, 0.8, 0.9, 0.9];
-let secondPathYArray = [1.5, 1.5, 3, 3, 1.25, 1.25, 4, 4, 1.25, 1.25, 3, 3, 1.5, 1.5, 2];
+let pathArray = [[0, 2, 0.1, 2], [0.1, 2, 0.1, 1.5], [0.1, 1.5, 0.2, 1.5], [0.2, 1.5, 0.2, 3], [0.2, 3, 0.3, 3], [0.3, 3, 0.3, 1.25], [0.3, 1.25, 0.4, 1.25], [0.4, 1.25, 0.4, 4], [0.4, 4, 0.6, 4], [0.6, 4, 0.6, 1.25], [0.6, 1.25, 0.7, 1.25], [0.7, 1.25, 0.7, 3], [0.7, 3, 0.8, 3], [0.8, 3, 0.8, 1.5], [0.8, 1.5, 0.9, 1.5], [0.9, 1.5, 0.9, 2], [0.9, 2, 1, 2]];
 let bossCounter = 0;
+let hit = false;
+let collide = false;
+let touching = false;
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
@@ -337,14 +341,22 @@ function normalEnemyAI() {
 // Draws the path that enemies follow.
 function drawPath() {
   stroke('white');
-  line(0, Math.floor(height/2),  Math.floor(width/10), Math.floor(height/2));
-  for (let i = 0; i < 15; i++) {
-    line(Math.floor(width * firstPathXArray[i]), Math.floor(height/firstPathYArray[i]), Math.floor(width * secondPathXArray[i]), Math.floor(height/secondPathYArray[i]));
+  for (let i = 0; i < 17; i++) {
+    line(Math.floor(width * pathArray[i][0]), Math.floor(height/pathArray[i][1]), Math.floor(width * pathArray[i][2]), Math.floor(height/pathArray[i][3]));
   }
-  line(Math.floor(width/10 * 9), Math.floor(height/2), width, Math.floor(height/2));
 }
 
-// Starts a round when the space bar is pressed, as long as there isn't a round already running.
+// Runs a for loop to find if a tower would be colliding with the path when place.
+function pathCollision() {
+  for (let i = 0; i < 17; i++) {
+    touching = collideLineCircle(Math.floor(width * pathArray[i][0]), Math.floor(height/pathArray[i][1]), Math.floor(width * pathArray[i][2]), Math.floor(height/pathArray[i][3]), mouseX, mouseY, 20);
+    if(touching === true) {
+      break;
+    }
+  }
+}
+
+// Starts a round when the space bar is pressed, as long as there isn't a round already running, and places a tower when 1, 2 or 3 is pressed. 
 function keyPressed() {
   if(keyCode === 32 && roundRunning === false && gameOver === false) {
     roundRunning = true;
@@ -380,22 +392,22 @@ function keyPressed() {
     resetGame();
   }
   
-  if (keyCode === 49 && money >= 100 && towerIsPlaceable) {
+  if (keyCode === 49 && money >= 100 && towerIsPlaceable && !touching) {
     let someTower = new LongRange(mouseX, mouseY, 10);
     towerArray.push(someTower);
-    money -= 100;
+    money -= someTower.cost;
   }
   
-  if (keyCode === 50 && money >= 50 && towerIsPlaceable) {
+  if (keyCode === 50 && money >= 50 && towerIsPlaceable && !touching) {
     let someTower = new MediumRange(mouseX, mouseY, 10);
     towerArray.push(someTower);
-    money -= 50;
+    money -= someTower.cost;
   }
   
-  if (keyCode === 51 && money >= 20 && towerIsPlaceable) {
+  if (keyCode === 51 && money >= 20 && towerIsPlaceable && !touching) {
     let someTower = new CloseRange(mouseX, mouseY, 10);
     towerArray.push(someTower);
-    money -= 20;
+    money -= someTower.cost;
   }
   
   if (keyCode === 72) {
@@ -409,6 +421,7 @@ function mousePressed() {
   for (let tower of towerArray) {
     let index = towerArray.indexOf(tower);
     if (dist(mouseX, mouseY, tower.x, tower.y) <= tower.radius) {
+      money += tower.cost / 2;
       towerArray.splice(index, 1);
     }
   }
@@ -480,6 +493,7 @@ function runGame() {
     normalEnemyAI();
     ui();
     directorAI();
+    pathCollision();
     if (playerHealth <= 0) {
       gameOver = true;
     }
