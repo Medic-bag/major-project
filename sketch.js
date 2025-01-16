@@ -5,11 +5,7 @@
 // Extra for Experts:
 // - 
 
-// to do list
-// collisoin with path
-
 // Classes
-
 // Parent class for the towers.
 class Tower {
   constructor(x, y, radius) {
@@ -300,6 +296,7 @@ let bossCounter = 0;
 let hit = false;
 let collide = false;
 let touching = false;
+let controlsShowing = true;
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
@@ -314,8 +311,20 @@ function draw() {
 function ui() {
   fill('white');
   text('Health: ' + playerHealth, 10, 10);
-  text('Money: ' + money, 10, 30);
+  text('Money: $' + money, 10, 30);
   text('Round: ' + round, 10, 50);
+
+  text("Press 'esc' to show / hide controls", width - 250, 10);
+  if (controlsShowing) {
+    text("Press '3' for Close Range tower: $20", width - 250, 30);
+    text("Press '2' for Basic tower: $50", width - 250, 50);
+    text("Press '1' for Long Range tower: $100", width - 250, 70);
+    text("Press 'Spacebar' to start a new round", width - 250, 90);
+    text("Click on a tower to sell it for half it's price",width - 250, 110);
+  }
+  
+  fill(255, 255, 255, 70);
+  circle(mouseX, mouseY, 20);
 }
 
 // Runs the basic ai for the enemies, displaying and moving them as well as making them deal and take damage.
@@ -410,9 +419,8 @@ function keyPressed() {
     money -= someTower.cost;
   }
   
-  if (keyCode === 72) {
-    round += 19;
-    money = 10000;
+  if (keyCode === 27) {
+    controlsShowing = !controlsShowing;
   }
 }
 
@@ -466,9 +474,9 @@ function directorAI() {
   }
   if (enemyArray.length === 0) {
     roundRunning = false;
+    // money += 5;
     bossCounter = 0;
   }
-
 }
 
 // Restarts the game when you click on the game over screen. 
