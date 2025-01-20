@@ -297,29 +297,15 @@ let hit = false;
 let collide = false;
 let touching = false;
 let controlsShowing = true;
-let song1;
-let song2;
-let song3;
-let song1Playing = false;
-let song2Playing = false;
-let song3Playing = false;
+let song;
+
+function preload() {
+  song = loadSound('newtouch.mp3');
+}
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
-  song1 = createAudio('blueshift.mp3');
-  song2 = createAudio('electriclandscape.mp3');
-  song3 = createAudio('newtouch.mp3');
-
-  song1.play();
-  song1.onended(song2.play());
-  song2.onended(song3.play());
-  song3.onended(song1.play());
-
-
-  // playSongs();
-  // song1.onended(playSongs());
-  // song2.onended(playSongs());
-  // song3.onended(playSongs());
+  song.loop();
 }
 
 function draw() {
@@ -453,6 +439,9 @@ function mousePressed() {
       towerArray.splice(index, 1);
     }
   }
+  if (gameOver) {
+    resetGame();
+  }
 }
 
 // Runs the basic ai for the towers allowing all of the towers to attack and be displayed.
@@ -522,7 +511,6 @@ function runGame() {
     ui();
     directorAI();
     pathCollision();
-    
     if (playerHealth <= 0) {
       gameOver = true;
     }
@@ -539,24 +527,3 @@ function endGameUI() {
   text('GAME OVER', width/2 - 10, height/2);
   text('LEFT CLICK TO RESTART', width/2 - 45, height/2 + 20);
 }
-
-// Plays background music.
-// function playSongs() {
-//   if (song1Playing === true) {
-//     song1Playing = false;
-//     song2Playing = true;
-//     song2.play();
-//   }
-
-//   else if (song2Playing === true) {
-//     song2Playing = false;
-//     song3Playing = true;
-//     song3.play();
-//   }
-
-//   else {
-//     song3Playing = false;
-//     song1Playing = true;
-//     song1.play();
-//   } 
-// }
